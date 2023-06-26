@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -9,15 +8,22 @@ import (
 	"path/filepath"
 )
 
-func handler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Hello, World2")
+func cors(fs http.Handler) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		origin := r.Header.Get("Origin")
+		if origin == "" {
+			origin = "*"
+		}
+		w.Header().Set("Access-Control-Allow-Origin", origin)
+		fs.ServeHTTP(w, r)
+	}
 }
 
 func main() {
 	os.MkdirAll("./file", os.ModePerm)
 
 	fs := http.FileServer(http.Dir("./file"))
-	http.Handle("/serve/", http.StripPrefix("/serve", fs))
+	http.Handle("/serve/", http.StripPrefix("/serve", cors(fs)))
 	http.HandleFunc("/", index)
 	http.HandleFunc("/upload", upload)
 	log.Println("Set up file server at port 20768")
