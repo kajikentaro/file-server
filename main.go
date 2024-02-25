@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -19,15 +20,18 @@ func cors(fs http.Handler) http.HandlerFunc {
 	}
 }
 
-func main() {
-	os.MkdirAll("./file", os.ModePerm)
+var DEFAULT_DEST_DIR = "./files"
+var DEFAULT_PORT_NUM = 20768
 
-	fs := http.FileServer(http.Dir("./file"))
+func main() {
+	os.MkdirAll(DEFAULT_DEST_DIR, os.ModePerm)
+
+	fs := http.FileServer(http.Dir(DEFAULT_DEST_DIR))
 	http.Handle("/serve/", http.StripPrefix("/serve", cors(fs)))
 	http.HandleFunc("/", index)
 	http.HandleFunc("/upload", upload)
-	log.Println("Set up file server at port 20768")
-	http.ListenAndServe(":20768", nil)
+	log.Printf("Set up file server at port %d\n", DEFAULT_PORT_NUM)
+	http.ListenAndServe(fmt.Sprintf(":%d", DEFAULT_PORT_NUM), nil)
 }
 
 func upload(w http.ResponseWriter, r *http.Request) {
