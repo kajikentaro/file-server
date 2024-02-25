@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"io"
 	"log"
@@ -20,18 +21,25 @@ func cors(fs http.Handler) http.HandlerFunc {
 	}
 }
 
-var DEFAULT_DEST_DIR = "./files"
-var DEFAULT_PORT_NUM = 20768
+var destDir string
+var portNum int
+
+func init() {
+	flag.StringVar(&destDir, "d", "./", "Directory to serve or store uploaded files")
+	flag.IntVar(&portNum, "p", 20768, "Port number to listen on")
+}
 
 func main() {
-	os.MkdirAll(DEFAULT_DEST_DIR, os.ModePerm)
+	flag.Parse()
 
-	fs := http.FileServer(http.Dir(DEFAULT_DEST_DIR))
+	os.MkdirAll(destDir, os.ModePerm)
+
+	fs := http.FileServer(http.Dir(destDir))
 	http.Handle("/serve/", http.StripPrefix("/serve", cors(fs)))
 	http.HandleFunc("/", index)
 	http.HandleFunc("/upload", upload)
-	log.Printf("Set up file server at port %d\n", DEFAULT_PORT_NUM)
-	http.ListenAndServe(fmt.Sprintf(":%d", DEFAULT_PORT_NUM), nil)
+	log.Printf("File server started. port: %d, target directory: \"%s\"\n", portNum, destDir)
+	http.ListenAndServe(fmt.Sprintf(":%d", portNum), nil)
 }
 
 func upload(w http.ResponseWriter, r *http.Request) {
@@ -54,7 +62,7 @@ func upload(w http.ResponseWriter, r *http.Request) {
 	defer file.Close()
 
 	destination := fileheader.Filename
-	f, err := os.Create(filepath.Join("./file", destination))
+	f, err := os.Create(filepath.Join(destDir, destination))
 	if err != nil {
 		http.Error(w, "create file"+err.Error(), http.StatusInternalServerError)
 		return
