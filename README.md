@@ -1,4 +1,4 @@
-# 最も単純なファイルサーバー
+# カレントディレクトリを公開するファイルサーバー
 
 ## Feature
 
@@ -10,7 +10,33 @@
 
 実行すると http://localhost:20768 にファイルサーバーが起動します
 
-## Development
+## Download
+
+バイナリファイルをこちらからダウンロードできます
+
+https://github.com/kajikentaro/file-server/releases/latest
+
+Go言語環境がインストールされている場合には、以下コマンドを使ってインストールすることもできます
+
+```
+$ go install github.com/kajikentaro/file-server@latest 
+```
+
+
+## Options
+
+```
+$ file-server -h
+Usage of ./file-server:
+  -d string
+        Directory to serve or store uploaded files (default "./")
+  -p int
+        Port number to listen on (default 20768)
+```
+
+
+
+## Build from source
 
 以下コマンドでビルドできます
 
