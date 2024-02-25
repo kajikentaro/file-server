@@ -7,9 +7,6 @@ on:
         description: 'Version'
         required: true
         default: 'v1.0.0'
-  push:
-    branches:
-      - master
 
 jobs:
   build-and-release:
