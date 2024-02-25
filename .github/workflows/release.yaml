@@ -21,11 +21,11 @@ jobs:
 
       - name: Build Windows executable
         run: |
-          GOOS=windows GOARCH=amd64 go build -o file-server-${{ github.event.inputs.version }}-windows-amd64.exe main.go
+          CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -o file-server-${{ github.event.inputs.version }}-windows-amd64.exe main.go
 
       - name: Build Linux executable
         run: |
-          GOOS=linux GOARCH=amd64 go build -o file-server-${{ github.event.inputs.version }}-linux-amd64 main.go
+          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o file-server-${{ github.event.inputs.version }}-linux-amd64 main.go
 
       - name: Create Release
         id: create_release
